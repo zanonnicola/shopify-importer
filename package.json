@@ -1,0 +1,24 @@
+{
+  "name": "shopify-importer",
+  "version": "1.0.0",
+  "description": "Import Customers, Orders and products to Shopify Store from CSV",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node",
+    "shopify",
+    "import"
+  ],
+  "author": "Nicola Zanon <nicola.zanon86@gmail.com> (https://nicola-zanon.com/)",
+  "license": "MIT",
+  "dependencies": {
+    "csvtojson": "^1.1.9",
+    "shopify-api-node": "^2.9.0"
+  },
+  "devDependencies": {
+    "prettier": "^1.7.4",
+    "prettier-eslint": "^8.2.1"
+  }
+}
