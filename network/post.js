@@ -16,7 +16,7 @@ module.exports = (json, endpoint, limit) => {
         response.status
       );
       // Keeping track of the current API limit
-      limit -= response.headers["x-shopify-shop-api-call-limit"].split("/")[0];
+      limit = response.headers["x-shopify-shop-api-call-limit"].split("/")[0];
       console.log(`Limit: ${limit}`);
     })
     .catch(function(error) {
