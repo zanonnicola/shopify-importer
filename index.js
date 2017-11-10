@@ -5,7 +5,9 @@ const delay = require("delay");
 
 const customerSchema = require("./entities/customer");
 const productSchema = require("./entities/products");
-const postDataToShopify = require("./network");
+const collectionSchema = require("./entities/collections");
+const postDataToShopify = require("./network/post");
+const getDataFromShopify = require("./network/get");
 
 const ROOT = __dirname;
 const filePath = path.normalize(path.join(ROOT, "csv/customers.csv"));
@@ -14,18 +16,18 @@ const customers = [];
 const products = [];
 let limit = 40;
 
-csv({ checkColumn: true, workerNum: 3 })
-  .fromFile(filePathProducts)
-  .on("json", jsonObj => {
-    products.push(jsonObj);
-  })
-  .on("done", error => {
-    if (error) {
-      throw new Error(`Something went wrong ${error}`);
-    }
-    console.log(`# of products: ${products.length}`);
-    createProduct(products);
-  });
+// csv({ checkColumn: true, workerNum: 3 })
+//   .fromFile(filePathProducts)
+//   .on("json", jsonObj => {
+//     products.push(jsonObj);
+//   })
+//   .on("done", error => {
+//     if (error) {
+//       throw new Error(`Something went wrong ${error}`);
+//     }
+//     console.log(`# of products: ${products.length}`);
+//     createProduct(products);
+//   });
 
 function createCustomer(arr) {
   arr.forEach(person => {
@@ -56,3 +58,19 @@ function createProduct(arr) {
     }
   });
 }
+
+getDataFromShopify("admin/products.json", "?product_type=machine")
+  .then(response => {
+    console.log(response.data.products);
+    return response.data.products;
+  })
+  .then(products => {
+    products.forEach(product => {
+      const data = collectionSchema(product);
+      const json = JSON.stringify(data);
+      postDataToShopify(json, "admin/collects.json", limit);
+    });
+  })
+  .catch(error => {
+    console.log(error);
+  });

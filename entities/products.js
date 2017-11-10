@@ -11,7 +11,7 @@ module.exports = product => {
       variants: [
         {
           price: product.price,
-          sku: "",
+          sku: product.sku,
           inventory_quantity: product.quantity,
           inventory_management: "shopify",
           weight: 0.0,
