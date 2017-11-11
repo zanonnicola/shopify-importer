@@ -11,7 +11,7 @@ const getDataFromShopify = require("./network/get");
 
 const ROOT = __dirname;
 const filePath = path.normalize(path.join(ROOT, "csv/customers.csv"));
-const filePathProducts = path.normalize(path.join(ROOT, "csv/products2.csv"));
+const filePathProducts = path.normalize(path.join(ROOT, "csv/products.csv"));
 const customers = [];
 const products = [];
 const maxAPIcalls = 35;
