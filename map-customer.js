@@ -1,13 +1,17 @@
 const fs = require("fs");
 const { promisify } = require("util");
 
-module.exports = (customer = {}, output = "json/customers.json") => {
+module.exports = (customers = [], output = "json/customers.json") => {
   const writeFileAsync = promisify(fs.writeFile);
   console.log("Writing....");
 
-  writeFileAsync(output, JSON.stringify(customer), { encoding: "utf8" })
-    .then(text => {
-      console.log("CUSTOMERS: Saved", text);
+  const data = {
+    customers
+  };
+
+  writeFileAsync(output, JSON.stringify(data), { encoding: "utf8" })
+    .then(_ => {
+      console.log("CUSTOMERS: Saved");
     })
     .catch(err => {
       console.log("ERROR:", err);

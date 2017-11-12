@@ -41,6 +41,8 @@ csv({ checkColumn: true, workerNum: 3 })
         customersIdMap.push(...res);
         console.log("syncLooop done", customersIdMap);
         console.log("Length", customersIdMap.length);
+
+        mapCustomer(customersIdMap);
       })
       .catch(function(error) {
         console.log("Error", error.message);
