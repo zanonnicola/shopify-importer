@@ -9,39 +9,65 @@ const collectionSchema = require("./entities/collections");
 const postDataToShopify = require("./network/post");
 const getDataFromShopify = require("./network/get");
 
+const mapCustomer = require("./map-customer");
+
 const ROOT = __dirname;
-const filePath = path.normalize(path.join(ROOT, "csv/customers.csv"));
+const filePathCustomers = path.normalize(path.join(ROOT, "csv/customers.csv"));
 const filePathProducts = path.normalize(path.join(ROOT, "csv/products.csv"));
 const customers = [];
+const customersIdMap = [];
 const products = [];
 const maxAPIcalls = 35;
-let numOfRequests;
 
 csv({ checkColumn: true, workerNum: 3 })
-  .fromFile(filePathProducts)
+  .fromFile(filePathCustomers)
   .on("json", jsonObj => {
-    products.push(jsonObj);
+    customers.push(jsonObj);
+    //products.push(jsonObj);
   })
   .on("done", error => {
     if (error) {
       throw new Error(`Something went wrong ${error}`);
     }
-    console.log(`# of products: ${products.length}`);
-    createProduct(products);
+    console.log(`# of products: ${customers.length}`);
+    //createProduct(products);
+
+    Promise.all(
+      customers.map(customer => {
+        return sendCustomersToShopify(customer);
+      })
+    )
+      .then(res => {
+        customersIdMap.push(...res);
+        console.log("syncLooop done", customersIdMap);
+        console.log("Length", customersIdMap.length);
+      })
+      .catch(function(error) {
+        console.log("Error", error.message);
+      });
   });
 
-function createCustomer(arr) {
-  arr.forEach(person => {
-    const data = customerSchema(person);
-    const json = JSON.stringify(data);
-
-    if (maxAPIcalls < numOfRequests) {
-      postDataToShopify(json, "admin/customers.json", numOfRequests);
-    } else {
-      delay(500).then(() => {
-        postDataToShopify(json, "admin/customers.json", numOfRequests);
+function sendCustomersToShopify(person) {
+  const data = customerSchema(person);
+  const json = JSON.stringify(data);
+  return new Promise(function(resolve) {
+    delay(500).then(() => {
+      postDataToShopify(json, "admin/customers.json").then(function(response) {
+        console.log(
+          response.headers["x-shopify-shop-api-call-limit"],
+          response.status
+        );
+        // Keeping track of the current API limit
+        numOfRequests = response.headers["x-shopify-shop-api-call-limit"].split(
+          "/"
+        )[0];
+        console.log(`Limit: ${numOfRequests}`);
+        resolve({
+          oldCustomerId: person.address_id,
+          newCustomerId: response.data.customer.id
+        });
       });
-    }
+    });
   });
 }
 
@@ -49,7 +75,6 @@ function createProduct(arr) {
   arr.forEach(product => {
     const data = productSchema(product);
     const json = JSON.stringify(data);
-
     if (maxAPIcalls < numOfRequests) {
       postDataToShopify(json, "/admin/products.json", numOfRequests);
     } else {
