@@ -1,4 +1,0 @@
-customer_group_id,name,customer_group,firstname,lastname,email,telephone,fax,address_id,company,address_1,address_2,postcode,city,zone_id,zone,zone_code,country_id,country,iso_code_2,iso_code_3
-1, MORAG MATHIE,Default, MORAG,MATHIE,moragmathie01@googlemail.com,7899806411,,801,,2 Marine Drive,,CH60 9JJ,Heswall,3529,Cheshire,CHES,222,United Kingdom,GB,GBR
-1,Aaron Clarke,Default,Aaron,Clarke,Monumentalink@hotmail.co.uk,1206571151,,673,Monumental ink and beauty,29c pear tree business centre,Pear tree road,Co3 3sa,Essex ,3547,Essex,ESX,222,United Kingdom,GB,GBR
-1,Abby Jinks,Default,Abby,Jinks,a.jinks@hotmail.co.uk,7730696671,,703,,38 Cromwell Ford Way,,NE21 4FH,Blaydon on Tyne,3601,Tyne and Wear,TWR,222,United Kingdom,GB,GBR
