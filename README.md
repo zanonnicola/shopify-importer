@@ -1,10 +1,10 @@
 # Shopify Importer
 
-I'm thinkging of creating a command line tool for this. At the moment I've hard-coded a lot of stuff because I didn't have time to do it properly 😅.
+I'm thinking of creating a command line tool for importing stuff into Shopify. At the moment I've hard-coded a lot of things because I didn't have time to do it properly 😅.
 
 You can fork it and dig into the code as you please.
 
-> It's still in dev.... ther emight be **BUGS** 😱
+> It's still in dev.... there might be **BUGS** 😱
 
 ## API KEYS
 
