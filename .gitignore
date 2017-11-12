@@ -14,8 +14,8 @@
 .env.test.local
 .env.production.local
 .vscode
-csv/*.csv
-paw
+/csv/*.csv
+/paw
 
 npm-debug.log*
 yarn-debug.log*
