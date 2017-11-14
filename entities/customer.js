@@ -15,11 +15,11 @@ module.exports = person => {
           province: null,
           company: person.company,
           phone: person.telephone,
-          phone: person.telephone,
           zip: person.postcode,
           last_name: person.firstname,
           first_name: person.lastname,
-          country: person.country
+          country_code: person.iso_code_2,
+          country_name: person.country
         }
       ]
     }
