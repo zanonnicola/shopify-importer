@@ -16,6 +16,7 @@
 .vscode
 /csv/*.csv
 /paw
+/store
 /json/*.json
 
 npm-debug.log*

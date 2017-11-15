@@ -3,6 +3,7 @@ const csv = require("csvtojson");
 const path = require("path");
 // const pThrottle = require('p-throttle');
 const throat = require("throat");
+const store = require("json-fs-store")();
 
 const customerSchema = require("./entities/customer");
 const postDataToShopify = require("./network/post");
@@ -25,24 +26,40 @@ csv({ checkColumn: true, workerNum: 3 })
       throw new Error(`Something went wrong ${error}`);
     }
     console.log(`# of customers: ${customers.length}`);
-
     const queue = customers.map(
-      throat(1, customer => {
-        return sendCustomersToShopify(customer);
+      throat(2, customer => {
+        return sendCustomersToShopify(customer)
+          .then(obj => {
+            obj.id = obj.oldCustomerId;
+            store.add(obj, err => {
+              // called when the file has been written
+              // to the /path/to/storage/location/12345.json
+              if (err) throw err; // err if the save failed
+            });
+          })
+          .catch(err => {
+            console.log(err);
+            const id = `err-${Math.floor(Math.random() * (1 - 2000)) + 1}`;
+            store.add({ id, error: err }, err => {
+              // called when the file has been written
+              // to the /path/to/storage/location/12345.json
+              if (err) throw err; // err if the save failed
+            });
+          });
       })
     );
 
-    Promise.all(queue)
-      .then(res => {
-        customersIdMap.push(...res);
-        console.log("syncLooop done", customersIdMap);
-        console.log("Length", customersIdMap.length);
+    // Promise.all(queue)
+    //   .then(res => {
+    //     customersIdMap.push(...res);
+    //     console.log("syncLooop done", customersIdMap);
+    //     console.log("Length", customersIdMap.length);
 
-        mapCustomer(customersIdMap);
-      })
-      .catch(function(error) {
-        console.log("Error in Promise.all ", error);
-      });
+    //     mapCustomer(customersIdMap);
+    //   })
+    //   .catch(function(error) {
+    //     console.log("Error in Promise.all ", error);
+    //   });
   });
 
 function sendCustomersToShopify(person) {
