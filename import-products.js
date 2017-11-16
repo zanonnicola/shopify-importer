@@ -1,15 +1,16 @@
 require("dotenv").config();
 const csv = require("csvtojson");
 const path = require("path");
-const delay = require("delay");
+const throat = require("throat");
+const store = require("json-fs-store")();
 
 const productSchema = require("./entities/products");
-const collectionSchema = require("./entities/collections");
 const postDataToShopify = require("./network/post");
-const getDataFromShopify = require("./network/get");
 
 const ROOT = __dirname;
-const filePathProducts = path.normalize(path.join(ROOT, "csv/products.csv"));
+const filePathProducts = path.normalize(
+  path.join(ROOT, "csv/products/all-needles.csv")
+);
 const products = [];
 const maxAPIcalls = 35;
 
@@ -23,35 +24,54 @@ csv({ checkColumn: true, workerNum: 3 })
       throw new Error(`Something went wrong ${error}`);
     }
     console.log(`# of products: ${products.length}`);
-    createProduct(products);
+    const queue = products.map(
+      throat(2, product => {
+        return sendProductsToShopify(product)
+          .then(obj => {
+            obj.id = obj.oldProductId;
+            store.add(obj, err => {
+              // called when the file has been written
+              // to the /path/to/storage/location/12345.json
+              if (err) throw err; // err if the save failed
+            });
+          })
+          .catch(err => {
+            console.log(err);
+            const id = `err-${Math.floor(Math.random() * (1 - 2000)) + 1}`;
+            store.add({ id, error: err }, err => {
+              // called when the file has been written
+              // to the /path/to/storage/location/12345.json
+              if (err) throw err; // err if the save failed
+            });
+          });
+      })
+    );
   });
 
-function createProduct(arr) {
-  arr.forEach(product => {
-    const data = productSchema(product);
-    const json = JSON.stringify(data);
-    if (maxAPIcalls < numOfRequests) {
-      postDataToShopify(json, "/admin/products.json", numOfRequests);
-    } else {
-      delay(500).then(() => {
-        postDataToShopify(json, "/admin/products.json", numOfRequests);
+function sendProductsToShopify(product) {
+  const data = productSchema(product, "All Needles");
+  const json = JSON.stringify(data);
+  return new Promise((resolve, reject) => {
+    postDataToShopify(json, "/admin/products.json")
+      .then(function(response) {
+        console.log(
+          response.headers["x-shopify-shop-api-call-limit"],
+          response.status
+        );
+        // Keeping track of the current API limit
+        numOfRequests = response.headers["x-shopify-shop-api-call-limit"].split(
+          "/"
+        )[0];
+        console.log(`Limit: ${numOfRequests}`);
+        console.log(`oldProductId: ${product.product_id}`);
+        resolve({
+          oldProductId: product.product_id,
+          category: product.category_name,
+          newProductId: response.data.product.id
+        });
+      })
+      .catch(err => {
+        reject(`Error in call: ${err} + ${product.product_id}`);
       });
-    }
   });
 }
-
-getDataFromShopify("admin/products.json", "?product_type=machine")
-  .then(response => {
-    console.log(response.data.products);
-    return response.data.products;
-  })
-  .then(products => {
-    products.forEach(product => {
-      const data = collectionSchema(product);
-      const json = JSON.stringify(data);
-      postDataToShopify(json, "admin/collects.json", limit);
-    });
-  })
-  .catch(error => {
-    console.log(error);
-  });

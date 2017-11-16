@@ -1,8 +1,8 @@
-module.exports = product => {
+module.exports = (product, collectionID) => {
   const data = {
     collect: {
-      product_id: product.id,
-      collection_id: 7224295453
+      product_id: product.variants[0].id,
+      collection_id: collectionID
     }
   };
   return data;

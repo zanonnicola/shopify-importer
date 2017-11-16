@@ -14,9 +14,10 @@
 .env.test.local
 .env.production.local
 .vscode
-/csv/*.csv
+/csv/**/*.csv
 /paw
 /store
+/store-customers
 /json/*.json
 
 npm-debug.log*
