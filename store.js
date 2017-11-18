@@ -1,8 +1,8 @@
 const store = require("json-fs-store")();
 
-store.load("778", function(err, object) {
+const arr = [];
+store.list(function(err, object) {
   if (err) throw err; // err if JSON parsing failed
-
-  // do something with object here
-  console.log(object);
+  const cat = object.filter(item => item.category == "Products & Accessories");
+  console.log(cat.length);
 });

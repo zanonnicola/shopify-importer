@@ -9,10 +9,9 @@ const postDataToShopify = require("./network/post");
 
 const ROOT = __dirname;
 const filePathProducts = path.normalize(
-  path.join(ROOT, "csv/products/all-needles.csv")
+  path.join(ROOT, "csv/products/products-accessories.csv")
 );
 const products = [];
-const maxAPIcalls = 35;
 
 csv({ checkColumn: true, workerNum: 3 })
   .fromFile(filePathProducts)
@@ -25,7 +24,7 @@ csv({ checkColumn: true, workerNum: 3 })
     }
     console.log(`# of products: ${products.length}`);
     const queue = products.map(
-      throat(2, product => {
+      throat(4, product => {
         return sendProductsToShopify(product)
           .then(obj => {
             obj.id = obj.oldProductId;
@@ -49,7 +48,7 @@ csv({ checkColumn: true, workerNum: 3 })
   });
 
 function sendProductsToShopify(product) {
-  const data = productSchema(product, "All Needles");
+  const data = productSchema(product, "Products & Accessories");
   const json = JSON.stringify(data);
   return new Promise((resolve, reject) => {
     postDataToShopify(json, "/admin/products.json")

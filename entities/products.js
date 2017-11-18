@@ -17,6 +17,7 @@ module.exports = (product, category) => {
       product_type: category,
       metafields_global_title_tag: product.meta_title,
       metafields_global_description_tag: product.meta_description,
+      tags: product.tags || "",
       variants: [
         {
           price: product.price,
