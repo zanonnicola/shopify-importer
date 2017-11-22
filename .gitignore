@@ -18,6 +18,7 @@
 /paw
 /store
 /store-customers
+/store-orders
 /json/*.json
 
 npm-debug.log*

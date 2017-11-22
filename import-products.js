@@ -9,7 +9,7 @@ const postDataToShopify = require("./network/post");
 
 const ROOT = __dirname;
 const filePathProducts = path.normalize(
-  path.join(ROOT, "csv/products/products-accessories.csv")
+  path.join(ROOT, "csv/products/BSDA-membership.csv")
 );
 const products = [];
 
@@ -48,7 +48,7 @@ csv({ checkColumn: true, workerNum: 3 })
   });
 
 function sendProductsToShopify(product) {
-  const data = productSchema(product, "Products & Accessories");
+  const data = productSchema(product, "BSDA Membership");
   const json = JSON.stringify(data);
   return new Promise((resolve, reject) => {
     postDataToShopify(json, "/admin/products.json")
