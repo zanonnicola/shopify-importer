@@ -21,3 +21,16 @@ PASSWORD=XXXXXXXXXXXXX
 ## RUN
 
 `node index.js`
+
+
+## SQL Query
+
+```
+SELECT `order`.`order_id`,
+`date_added`,
+`order_total`.`value` AS tax_total
+FROM `order`
+LEFT JOIN `order_total` ON `order`.`order_id` = `order_total`.`order_id`
+ORDER BY `order_id` DESC,
+`date_added` LIMIT 8
+```
