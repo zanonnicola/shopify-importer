@@ -1,7 +1,7 @@
 const fs = require("fs");
 const { promisify } = require("util");
 
-module.exports = (customers = [], output = "json/customers.json") => {
+module.exports = (customers = [], output = "json/products.json") => {
   const writeFileAsync = promisify(fs.writeFile);
   console.log("Writing....");
 

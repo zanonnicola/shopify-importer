@@ -19,6 +19,7 @@
     "csvtojson": "^1.1.9",
     "dotenv": "^4.0.0",
     "html-entities": "^1.2.1",
+    "isomorphic-fetch": "^2.2.1",
     "json-fs-store": "^1.0.1",
     "lodash": "^4.17.4",
     "shopify-api-node": "^2.9.0",
