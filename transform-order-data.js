@@ -6,24 +6,26 @@ const merge = require("./merge-csv");
 const finalArr = [];
 
 merge().then(byId => {
-  const finalObj = {
-    line_items: [],
-    subTotal: 0,
-    shipping: 0,
-    tax: 0,
-    total: 0
-  };
   _.forOwn(byId, function(value, key) {
+    const finalObj = {
+      line_items: [],
+      subTotal: 0,
+      shipping: 0,
+      tax: 0,
+      total: 0
+    };
+    console.log("forOwn");
     value.forEach(item => {
+      console.log("forEach");
       for (const key in item) {
         if (item.hasOwnProperty(key)) {
           const element = item[key];
           if (key == "product_item") {
-            finalObj.line_items.push({
+            const lineItems = {
               variant_id: element,
               name: item.product_name,
               title: item.product_name,
-              price: parseFloat(item.product_total),
+              price: parseFloat(item.product_price),
               quantity: item.product_quantity,
               vendor: "Finishing Touches",
               tax_lines: [
@@ -33,21 +35,28 @@ merge().then(byId => {
                   title: "VAT"
                 }
               ]
-            });
+            };
+            finalObj.line_items.push(lineItems);
           } else {
             finalObj[key] = element;
           }
-          subTotal = item["sub_total"];
-          shipping = item["shipping"];
-          tax = item["tax"];
-          total = item["total"];
+          finalObj.subTotal = item["sub_total"];
+          finalObj.shipping = item["shipping"];
+          finalObj.tax = item["tax"];
+          finalObj.total = item["total"];
         }
       }
     });
-    if (finalObj.order_id !== value.order_id) {
-      finalArr.push(finalObj);
-    }
+    console.log(finalObj.order_id, finalArr.length);
+    //console.log(finalObj.order_id, value[0].order_id);
+    finalArr.push(finalObj);
   });
+  console.log(
+    "+++++++++++++++++++++++\n",
+    finalArr.length,
+    "\n+++++++++++++++++++++++\n"
+  );
+  console.log(finalArr[2].order_id, finalArr[0].order_id);
   finalArr.forEach((data, index) => {
     data.id = index + 1;
     ordersStore.add(data, function(err) {
