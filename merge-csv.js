@@ -53,4 +53,6 @@ const merge = async function() {
   return obj;
 };
 
+// merge().then();
+
 module.exports = merge;
