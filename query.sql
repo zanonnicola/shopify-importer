@@ -1,6 +1,6 @@
 /* First Query */
-SELECT o2.*, `order_product
-`.`product_id` AS product_item,
+SELECT o2.*, 
+	`order_product`.`product_id` AS product_item,
     `order_product`.`name` AS product_name,
      `order_product`.`price` AS product_price,
 	`order_product`.`quantity` AS product_quantity,
@@ -8,8 +8,7 @@ SELECT o2.*, `order_product
 	`order_status`.`name` AS status
 FROM
 (
-SELECT o.`order_id`, o.`date_added
-`,
+SELECT o.`order_id`, o.`date_added`,
 	o.`firstname`,
 	o.`lastname`, 
 	o.`email`, 
@@ -52,12 +51,11 @@ LEFT JOIN `order_product` ON o2.`order_id` = `order_product`.`order_id`
 LEFT JOIN `order_status` ON o2.`order_status_id` = `order_status`.`order_status_id`
 LEFT JOIN `order_option` ON `order_product`.`order_product_id` = `order_option`.`order_product_id`
 /* Second Query */
-SELECT o2.*, `order_total
-`.`title` AS code_title,
+SELECT o2.*, 
+	`order_total`.`title` AS code_title,
 	`order_total`.`value` AS code_value
 FROM
-(SELECT o.`order_id
-`
+(SELECT o.`order_id`
 FROM 
 	`order` o 
 WHERE 
