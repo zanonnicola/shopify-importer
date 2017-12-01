@@ -4,7 +4,9 @@
   "description": "Import Customers, Orders and products to Shopify Store from CSV",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rimraf store-orders/*",
+    "preimport": "npm run clean",
+    "import": "node transform-order-data.js && node import-orders.js"
   },
   "keywords": [
     "node",
@@ -22,6 +24,7 @@
     "isomorphic-fetch": "^2.2.1",
     "json-fs-store": "^1.0.1",
     "lodash": "^4.17.4",
+    "rimraf": "^2.6.2",
     "shopify-api-node": "^2.9.0",
     "throat": "^4.1.0"
   },

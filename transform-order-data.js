@@ -14,9 +14,7 @@ merge().then(byId => {
       tax: 0,
       total: 0
     };
-    console.log("forOwn");
     value.forEach(item => {
-      console.log("forEach");
       for (const key in item) {
         if (item.hasOwnProperty(key)) {
           const element = item[key];
@@ -27,14 +25,7 @@ merge().then(byId => {
               title: item.product_name,
               price: parseFloat(item.product_price),
               quantity: item.product_quantity,
-              vendor: "Finishing Touches",
-              tax_lines: [
-                {
-                  price: parseFloat(item.product_price),
-                  rate: 0.2,
-                  title: "VAT"
-                }
-              ]
+              vendor: "Finishing Touches"
             };
             finalObj.line_items.push(lineItems);
           } else {
@@ -47,8 +38,7 @@ merge().then(byId => {
         }
       }
     });
-    console.log(finalObj.order_id, finalArr.length);
-    //console.log(finalObj.order_id, value[0].order_id);
+    //console.log(finalObj.order_id, finalArr.length);
     finalArr.push(finalObj);
   });
   console.log(
@@ -58,7 +48,7 @@ merge().then(byId => {
   );
   console.log(finalArr[2].order_id, finalArr[0].order_id);
   finalArr.forEach((data, index) => {
-    data.id = index + 1;
+    data.id = `${index}o`;
     ordersStore.add(data, function(err) {
       if (err) throw err; // err if the save failed
     });

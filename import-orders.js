@@ -2,39 +2,46 @@ require("dotenv").config();
 const productStore = require("json-fs-store")();
 const customersStore = require("json-fs-store")("./store-customers");
 const ordersStore = require("json-fs-store")("./store-orders");
+const createThrottle = require("async-throttle");
 
 const postDataToShopify = require("./network/post");
+const throttle = createThrottle(2);
 
-ordersStore.list(function(err, object) {
+ordersStore.list(function(err, orders) {
   if (err) throw err; // err if JSON parsing failed
-  constructObj(object[1])
-    .then(obj => {
-      const json = JSON.stringify(obj);
-      console.log(json);
-      postDataToShopify(json, "/admin/orders.json")
-        .then(response => {
-          console.log(
-            response.headers["x-shopify-shop-api-call-limit"],
-            response.status
-          );
-          // Keeping track of the current API limit
-          numOfRequests = response.headers[
-            "x-shopify-shop-api-call-limit"
-          ].split("/")[0];
-          console.log(`Limit: ${numOfRequests}`);
-          console.log(response.data.order.id);
+  orders.forEach(order => {
+    console.log(order.customer_id);
+    constructObj(order)
+      .then(obj => {
+        const json = JSON.stringify(obj);
+        throttle(async () => {
+          const res = await postDataToShopify(json, "/admin/orders.json");
+          return res;
         })
-        .catch(err => {
-          console.log(`Error in call: ${err}`);
-        });
-    })
-    .catch(err => {
-      console.log(err);
-    });
+          .then(response => {
+            console.log(
+              response.headers["x-shopify-shop-api-call-limit"],
+              response.status
+            );
+            // Keeping track of the current API limit
+            numOfRequests = response.headers[
+              "x-shopify-shop-api-call-limit"
+            ].split("/")[0];
+            console.log(`Limit: ${numOfRequests}`);
+            console.log(response.data.order.id);
+          })
+          .catch(err => {
+            console.log(`Error in call: ${err}`);
+          });
+      })
+      .catch(err => {
+        console.log(err);
+      });
+  });
 });
 
 async function constructObj(item) {
-  const customerObj = await loadObjFromStore(item.Customer_id, customersStore);
+  const customerObj = await loadObjFromStore(item.customer_id, customersStore);
   const lines = await Promise.all(
     item.line_items.map(async product => {
       return await loadObjFromStore(product.variant_id, productStore);
@@ -47,15 +54,13 @@ async function constructObj(item) {
     }
   });
 
-  const shippingPrice = round(item.Order_total - item.productsSum, 2);
-
   return {
     order: {
       fulfillment_status: "fulfilled",
       note_attributes: [
         {
           name: "Comment",
-          value: item.Comment
+          value: item.comment
         }
       ],
       line_items: [...item.line_items],
@@ -66,35 +71,36 @@ async function constructObj(item) {
         {
           kind: "sale",
           status: "success",
-          amount: item.Order_total
+          amount: item.total
         }
       ],
-      financial_status: normalizeStatus(item.Status),
+      financial_status: normalizeStatus(item.status),
       shipping_address: {
-        first_name: item.Shipping_firstname,
-        last_name: item.Shipping_lastname,
-        company: item.Shipping_company,
-        address1: item.Shipping_address_1,
-        address2: item.Shipping_address_2,
-        city: item.Shipping_city,
-        country: item.Shipping_country,
-        zip: item.Shipping_postcode
+        first_name: item.shipping_firstname,
+        last_name: item.shipping_lastname,
+        company: item.shipping_company,
+        address1: item.shipping_address_1,
+        address2: item.shipping_address_2,
+        city: item.shipping_city,
+        country: item.shipping_country,
+        zip: item.shipping_postcode
       },
       billing_address: {
-        first_name: item.Payment_firstname,
-        last_name: item.Payment_lastname,
-        company: item.Payment_company,
-        address1: item.Payment_address_1,
-        address2: item.Payment_address_2,
-        city: item.Payment_city,
-        country: item.Payment_country,
-        zip: item.Payment_postcode
+        first_name: item.payment_firstname,
+        last_name: item.payment_lastname,
+        company: item.payment_company,
+        address1: item.payment_address_1,
+        address2: item.payment_address_2,
+        city: item.payment_city,
+        country: item.payment_country,
+        zip: item.payment_postcode
       },
-      total_tax: 10.8,
+      total_tax: item.tax,
+      subtotal_price: item.subTotal,
       shipping_lines: [
         {
-          code: item.Shipping_method,
-          price: shippingPrice,
+          code: item.shipping_method,
+          price: item.shipping,
           title: "Courier",
           carrier_identifier: null,
           requested_fulfillment_service_id: null

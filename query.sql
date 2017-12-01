@@ -42,27 +42,30 @@ SELECT o.`order_id`, o.`date_added`,
 FROM 
 	`order` o 
 WHERE 
-	o.`order_status_id` > 0
+	o.`order_status_id` > 0 AND
+	o.`order_id` < 14678
+	
 ORDER BY 
 	o.`date_added` DESC
-	LIMIT 4
+	LIMIT 150
 ) o2
 LEFT JOIN `order_product` ON o2.`order_id` = `order_product`.`order_id`
 LEFT JOIN `order_status` ON o2.`order_status_id` = `order_status`.`order_status_id`
-LEFT JOIN `order_option` ON `order_product`.`order_product_id` = `order_option`.`order_product_id`
+LEFT JOIN `order_option` ON `order_product`.`order_product_id` = `order_option`.`order_product_id`;
+
 /* Second Query */
 SELECT o2.*, 
-	`order_total`.`title` AS code_title,
+	`order_total`.`code` AS code_title,
 	`order_total`.`value` AS code_value
 FROM
 (SELECT o.`order_id`
 FROM 
 	`order` o 
 WHERE 
-	o.`order_status_id` > 0
+	o.`order_status_id` > 0 AND
+	o.`order_id` < 14678
 ORDER BY 
 	o.`date_added` DESC
-	LIMIT 4
+	LIMIT 150
 ) o2
 LEFT JOIN `order_total` ON o2.`order_id` = `order_total`.`order_id`
-
