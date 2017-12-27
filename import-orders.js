@@ -128,7 +128,7 @@ function normalizeStatus(status) {
       return "paid";
       break;
     case "Processing":
-      return "pending";
+      return "paid";
       break;
     case "Refunded":
       return "refunded";
