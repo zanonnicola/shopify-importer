@@ -6,7 +6,7 @@ module.exports = person => {
       last_name: person.lastname,
       phone: person.telephone,
       verified_email: true,
-      send_email_invite: false,
+      send_email_invite: true,
       addresses: [
         {
           address1: person.address_1,

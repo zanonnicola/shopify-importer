@@ -8,10 +8,8 @@ const store = require("json-fs-store")();
 const customerSchema = require("./entities/customer");
 const postDataToShopify = require("./network/post");
 
-const mapCustomer = require("./map-customer");
-
 const ROOT = __dirname;
-const filePathCustomers = path.normalize(path.join(ROOT, "csv/test.csv"));
+const filePathCustomers = path.normalize(path.join(ROOT, "csv/customers.csv"));
 const customers = [];
 const customersIdMap = [];
 const maxAPIcalls = 35;
@@ -48,18 +46,6 @@ csv({ checkColumn: true, workerNum: 3 })
           });
       })
     );
-
-    // Promise.all(queue)
-    //   .then(res => {
-    //     customersIdMap.push(...res);
-    //     console.log("syncLooop done", customersIdMap);
-    //     console.log("Length", customersIdMap.length);
-
-    //     mapCustomer(customersIdMap);
-    //   })
-    //   .catch(function(error) {
-    //     console.log("Error in Promise.all ", error);
-    //   });
   });
 
 function sendCustomersToShopify(person) {
