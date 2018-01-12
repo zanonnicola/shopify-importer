@@ -8,7 +8,7 @@ const maxAPIcalls = 35;
 
 getDataFromShopify(
   "admin/customers.json",
-  "?created_at_max=2018-01-10 23:07:25"
+  "100&created_at_max=2018-01-09 23:07:25"
 )
   .then(response => {
     console.log(response.data.customers.length);
@@ -17,13 +17,17 @@ getDataFromShopify(
   .then(customers => {
     const queue = customers.map(
       throat(2, customer => {
-        return sendInvite(customer)
+        console.log(customer.state, customer.id);
+        if (customer.state === 'disabled') {
+          return sendInvite(customer)
           .then(_ => {
             console.log("Done");
           })
           .catch(err => {
             console.log(err);
           });
+        }
+        return Promise.resolve('No');
       })
     );
   })
